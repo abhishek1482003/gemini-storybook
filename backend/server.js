@@ -72,7 +72,7 @@ if (!fs.existsSync(uploadsDir)) {
 // Generate story content
 async function generateStory(prompt) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     const storyPrompt = `Create a 5-page children's storybook based on this prompt: "${prompt}". 
 
