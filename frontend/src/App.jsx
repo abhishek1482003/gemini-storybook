@@ -6,6 +6,7 @@ function App() {
   const [prompt, setPrompt] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState('')
+  const [generationStep, setGenerationStep] = useState('')
 
   const handleGenerateStorybook = async () => {
     if (!prompt.trim()) {
@@ -15,6 +16,7 @@ function App() {
 
     setIsGenerating(true)
     setError('')
+    setGenerationStep('Creating your magical story...')
 
     try {
       const response = await fetch('http://localhost:5000/api/generate-storybook', {
@@ -29,6 +31,8 @@ function App() {
         const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to generate storybook')
       }
+
+      setGenerationStep('Preparing your download...')
 
       // Get the PDF blob
       const blob = await response.blob()
@@ -45,10 +49,12 @@ function App() {
 
       // Clear the prompt after successful generation
       setPrompt('')
+      setGenerationStep('Story created successfully!')
     } catch (err) {
       setError(err.message || 'Something went wrong')
     } finally {
       setIsGenerating(false)
+      setTimeout(() => setGenerationStep(''), 2000) // Clear step after 2 seconds
     }
   }
 
@@ -91,12 +97,25 @@ function App() {
                 placeholder="Describe your story idea... For example: 'A brave little mouse who discovers a magical garden'"
                 className="w-full h-32 p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all resize-none"
                 disabled={isGenerating}
+                maxLength={500}
               />
+              <div className="text-right text-sm text-gray-500 mt-1">
+                {prompt.length}/500 characters
+              </div>
             </div>
 
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-red-600">{error}</p>
+              </div>
+            )}
+
+            {generationStep && (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-blue-600 flex items-center">
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {generationStep}
+                </p>
               </div>
             )}
 
